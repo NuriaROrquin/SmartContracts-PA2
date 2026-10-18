@@ -1,0 +1,141 @@
+@model DetalleObraViewModel
+@inject ServicioParticipantes Participantes
+@inject Cotizacion Cotizacion
+@{
+    Obra obra = Model.Obra;
+    ViewData["Title"] = obra.Descripcion;
+    string nombreEmpresa = Participantes.NombreDe(obra.Proveedor);
+    string nombreAprobador = Participantes.NombreDe(obra.Aprobador);
+    int porcentajePagado = obra.TotalWei.IsZero ? 0 : (int)(obra.PagadoWei * 100 / obra.TotalWei);
+
+    var roles = new List<string>();
+    if (Model.ActualEsCliente) { roles.Add("el cliente"); }
+    if (Model.ActualEsEmpresa) { roles.Add("la empresa"); }
+    if (Model.ActualEsAprobador) { roles.Add("quien aprueba las etapas"); }
+
+    bool puedeActuar = obra.Etapas.Any(e =>
+        (e.Estado == EstadoEtapa.EnCurso && Model.ActualEsEmpresa) ||
+        (e.Estado == EstadoEtapa.Terminada && Model.ActualEsAprobador));
+}
+
+<a asp-action="Index" class="small">← Todas las obras</a>
+
+<div class="row g-4 mt-0">
+    <div class="col-lg-8">
+        <h2 class="mb-1">@obra.Descripcion <span class="text-muted fs-5">Obra #@obra.Id</span></h2>
+        <p class="mb-1">
+            <strong>Cliente:</strong> @Participantes.NombreDe(obra.Cliente) ·
+            <strong>Empresa:</strong> @nombreEmpresa ·
+            <strong>Aprueba:</strong> @nombreAprobador
+        </p>
+        <p class="small text-muted">
+            Estás actuando como <strong>@Model.Actual.Nombre</strong>@(roles.Any()
+                ? ": en esta obra sos " + string.Join(" y ", roles) + "."
+                : ", que no participa en esta obra.")
+        </p>
+
+        <div class="row g-2 mb-2 text-center">
+            <div class="col-4">
+                <div class="border rounded p-2">
+                    <div class="small text-muted">Total de la obra</div>
+                    <div class="fs-5">USD @Cotizacion.WeiAUsd(obra.TotalWei).ToString("N0")</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="border rounded p-2 caja-fuerte">
+                    <div class="small text-muted">🔒 Retenido en el contrato</div>
+                    <div class="fs-5 fw-bold">USD @Cotizacion.WeiAUsd(obra.SaldoRetenidoWei).ToString("N0")</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="border rounded p-2">
+                    <div class="small text-muted">Pagado a la empresa</div>
+                    <div class="fs-5 text-success">USD @Cotizacion.WeiAUsd(obra.PagadoWei).ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+        <div class="progress mb-4" role="progressbar" aria-label="Porcentaje pagado" aria-valuenow="@porcentajePagado" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar bg-success" style="width: @porcentajePagado%">@porcentajePagado%</div>
+        </div>
+
+        @if (obra.Finalizada)
+        {
+            <div class="alert alert-success">
+                Obra finalizada: se aprobaron todas las etapas, la empresa cobró el total y el contrato ya no retiene nada de esta obra.
+            </div>
+        }
+        else if (!puedeActuar)
+        {
+            <div class="alert alert-info small">
+                Para hacer el siguiente paso, cambiá de participante en la barra de arriba ("Estás actuando como").
+            </div>
+        }
+
+        <h5>Etapas</h5>
+        @foreach (Etapa etapa in obra.Etapas)
+        {
+            string monto = $"USD {Cotizacion.WeiAUsd(etapa.MontoWei):N0}";
+            string borde = etapa.Estado switch
+            {
+                EstadoEtapa.Aprobada => "border-success",
+                EstadoEtapa.Terminada => "border-warning",
+                _ => ""
+            };
+
+            <div class="card mb-2 etapa @borde">
+                <div class="card-body d-flex flex-wrap align-items-center gap-3">
+                    <div class="flex-grow-1">
+                        <strong>Etapa @(etapa.Numero + 1): @etapa.Descripcion</strong>
+                        <div class="small text-muted">@monto</div>
+                    </div>
+                    <div><partial name="_EstadoEtapa" model="etapa.Estado" /></div>
+                    <div class="acciones-etapa">
+                        @switch (etapa.Estado)
+                        {
+                            case EstadoEtapa.EnCurso when Model.ActualEsEmpresa:
+                                <form asp-action="MarcarTerminada" asp-route-id="@obra.Id" method="post" class="form-blockchain">
+                                    <input type="hidden" name="etapa" value="@etapa.Numero" />
+                                    <button type="submit" class="btn btn-sm btn-primary">Avisar que terminé</button>
+                                </form>
+                                break;
+                            case EstadoEtapa.EnCurso:
+                                <span class="small text-muted">Esperando que @nombreEmpresa avise que terminó.</span>
+                                break;
+                            case EstadoEtapa.Terminada when Model.ActualEsAprobador:
+                                <div class="d-flex gap-2">
+                                    <form asp-action="Aprobar" asp-route-id="@obra.Id" method="post" class="form-blockchain">
+                                        <input type="hidden" name="etapa" value="@etapa.Numero" />
+                                        <button type="submit" class="btn btn-sm btn-success">Aprobar y pagar @monto</button>
+                                    </form>
+                                    <form asp-action="Rechazar" asp-route-id="@obra.Id" method="post" class="form-blockchain">
+                                        <input type="hidden" name="etapa" value="@etapa.Numero" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Rechazar</button>
+                                    </form>
+                                </div>
+                                break;
+                            case EstadoEtapa.Terminada:
+                                <span class="small text-muted">Esperando que @nombreAprobador la revise.</span>
+                                break;
+                            case EstadoEtapa.Aprobada:
+                                <span class="small text-success">Pagada a @nombreEmpresa.</span>
+                                break;
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <partial name="_Billeteras" model="Model.Billeteras" />
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('.form-blockchain').on('submit', function () {
+            $('.form-blockchain button').prop('disabled', true);
+            $(this).find('button').text('Esperando la blockchain...');
+        });
+    </script>
+}

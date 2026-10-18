@@ -1,0 +1,293 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "etapa",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "monto",
+        "type": "uint256"
+      }
+    ],
+    "name": "EtapaAprobada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "etapa",
+        "type": "uint256"
+      }
+    ],
+    "name": "EtapaRechazada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "etapa",
+        "type": "uint256"
+      }
+    ],
+    "name": "EtapaTerminada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "cliente",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "proveedor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "total",
+        "type": "uint256"
+      }
+    ],
+    "name": "ObraCreada",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAXIMO_ETAPAS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numeroEtapa",
+        "type": "uint256"
+      }
+    ],
+    "name": "aprobar",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cantidadObras",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numeroEtapa",
+        "type": "uint256"
+      }
+    ],
+    "name": "consultarEtapa",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "descripcion",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "monto",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PagoPorEtapas.EstadoEtapa",
+        "name": "estado",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      }
+    ],
+    "name": "consultarObra",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "descripcion",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "cliente",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "proveedor",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "aprobador",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "saldoRetenido",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cantidadEtapas",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "descripcion",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "proveedor",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "aprobador",
+        "type": "address"
+      },
+      {
+        "internalType": "string[]",
+        "name": "descripcionesEtapas",
+        "type": "string[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "montosEtapas",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "crearObra",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numeroEtapa",
+        "type": "uint256"
+      }
+    ],
+    "name": "marcarTerminada",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "obraId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numeroEtapa",
+        "type": "uint256"
+      }
+    ],
+    "name": "rechazar",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

@@ -1,0 +1,71 @@
+﻿@inject ServicioParticipantes Participantes
+@{
+    Participante actual = Participantes.ObtenerActual(Context.Session);
+    string volverA = Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Pago por etapas</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PagoPorEtapas.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom box-shadow">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">🏗️ Pago por etapas</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Mostrar menú">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Obras" asp-action="Index">Obras</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Obras" asp-action="Nueva">Nueva obra</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="barra-participante border-bottom mb-3">
+            <div class="container">
+                <form class="d-flex flex-wrap align-items-center gap-2 py-2" asp-controller="Participantes" asp-action="Cambiar" method="post">
+                    <input type="hidden" name="volverA" value="@volverA" />
+                    <label for="selector-participante" class="small text-nowrap mb-0">Estás actuando como</label>
+                    <select id="selector-participante" name="id" class="form-select form-select-sm selector-participante" onchange="this.form.submit()">
+                        @foreach (Participante participante in Participantes.Todos)
+                        {
+                            <option value="@participante.Id" selected="@(participante.Id == actual.Id)">@participante.Nombre</option>
+                        }
+                    </select>
+                    <noscript><button type="submit" class="btn btn-sm btn-outline-secondary">Cambiar</button></noscript>
+                </form>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <partial name="_Mensaje" />
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            TP de investigación: Blockchain con .NET · Programación Avanzada II · UNLaM
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

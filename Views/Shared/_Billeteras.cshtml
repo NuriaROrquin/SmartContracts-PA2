@@ -1,0 +1,36 @@
+@model BilleterasViewModel
+
+<div class="card">
+    <div class="card-header"><strong>Billeteras</strong></div>
+    <ul class="list-group list-group-flush">
+        @foreach (SaldoParticipante saldo in Model.Participantes)
+        {
+            bool esActual = saldo.Participante.Id == Model.IdParticipanteActual;
+            <li class="list-group-item d-flex justify-content-between align-items-start gap-2 @(esActual ? "billetera-actual" : "")">
+                <span>
+                    @saldo.Participante.Nombre
+                    @if (esActual)
+                    {
+                        <span class="badge bg-primary ms-1">vos</span>
+                    }
+                    <br /><code class="hash small">@ServicioParticipantes.Abreviar(saldo.Participante.Direccion)</code>
+                </span>
+                <span class="text-nowrap">USD @saldo.SaldoUsd.ToString("N2")</span>
+            </li>
+        }
+        <li class="list-group-item d-flex justify-content-between align-items-start gap-2 caja-fuerte">
+            <span>
+                🔒 <strong>Caja fuerte del contrato</strong>
+                <br /><code class="hash small">@ServicioParticipantes.Abreviar(Model.DireccionContrato)</code>
+                @if (Model.UrlContrato != null)
+                {
+                    <a class="small" href="@Model.UrlContrato" target="_blank" rel="noopener">ver ↗</a>
+                }
+            </span>
+            <span class="text-nowrap fw-bold">USD @Model.SaldoContratoUsd.ToString("N2")</span>
+        </li>
+    </ul>
+    <div class="card-footer small text-muted">
+        La plata es de práctica. Cada vez que alguien firma una operación, la red le descuenta unos centavos de "gas".
+    </div>
+</div>

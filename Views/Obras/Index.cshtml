@@ -1,0 +1,57 @@
+@model ListaObrasViewModel
+@inject ServicioParticipantes Participantes
+@inject Cotizacion Cotizacion
+@{
+    ViewData["Title"] = "Obras";
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Obras</h2>
+            <a class="btn btn-primary" asp-action="Nueva">Nueva obra</a>
+        </div>
+
+        @if (Model.Obras.Count == 0)
+        {
+            <div class="alert alert-light border">
+                Todavía no hay obras en el contrato. Creá la primera como <strong>clienta</strong>.
+            </div>
+        }
+
+        @foreach (Obra obra in Model.Obras)
+        {
+            int porcentajePagado = obra.TotalWei.IsZero ? 0 : (int)(obra.PagadoWei * 100 / obra.TotalWei);
+            <a class="card mb-3 text-decoration-none text-reset tarjeta-obra" asp-action="Detalle" asp-route-id="@obra.Id">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <h5 class="card-title mb-1">@obra.Descripcion <span class="text-muted fs-6">#@obra.Id</span></h5>
+                        @if (obra.Finalizada)
+                        {
+                            <span class="badge bg-success align-self-start">Finalizada</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info text-dark align-self-start">@obra.EtapasAprobadas de @obra.Etapas.Count etapas pagadas</span>
+                        }
+                    </div>
+                    <p class="small text-muted mb-2">
+                        @Participantes.NombreDe(obra.Cliente) → @Participantes.NombreDe(obra.Proveedor) ·
+                        Aprueba: @Participantes.NombreDe(obra.Aprobador)
+                    </p>
+                    <div class="progress mb-1" role="progressbar" aria-valuenow="@porcentajePagado" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar bg-success" style="width: @porcentajePagado%"></div>
+                    </div>
+                    <div class="small">
+                        Pagado USD @Cotizacion.WeiAUsd(obra.PagadoWei).ToString("N0") de USD @Cotizacion.WeiAUsd(obra.TotalWei).ToString("N0")
+                        · Retenido en el contrato: USD @Cotizacion.WeiAUsd(obra.SaldoRetenidoWei).ToString("N0")
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <partial name="_Billeteras" model="Model.Billeteras" />
+    </div>
+</div>

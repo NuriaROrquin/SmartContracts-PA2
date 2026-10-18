@@ -1,0 +1,16 @@
+@if (TempData["Mensaje"] is string mensaje)
+{
+    <div class="alert alert-@(TempData["TipoMensaje"] ?? "info")">
+        @mensaje
+        @if (TempData["HashTransaccion"] is string hash)
+        {
+            <div class="small mt-1">
+                Comprobante de la transacción: <code class="hash">@hash</code>
+                @if (TempData["UrlTransaccion"] is string url)
+                {
+                    <a href="@url" target="_blank" rel="noopener">ver en el explorador ↗</a>
+                }
+            </div>
+        }
+    </div>
+}

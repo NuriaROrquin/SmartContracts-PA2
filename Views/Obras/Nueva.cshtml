@@ -1,0 +1,126 @@
+@model NuevaObraViewModel
+@inject ServicioParticipantes Participantes
+@{
+    ViewData["Title"] = "Nueva obra";
+    Participante actual = Participantes.ObtenerActual(Context.Session);
+    var empresas = Participantes.ConRol(RolParticipante.Empresa).ToList();
+    var aprobadores = Participantes.Todos.Where(p => p.Rol != RolParticipante.Empresa).ToList();
+    Participante? primerCliente = Participantes.ConRol(RolParticipante.Cliente).FirstOrDefault();
+}
+
+<h2>Nueva obra</h2>
+
+@if (actual.Rol != RolParticipante.Cliente && primerCliente != null)
+{
+    <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2">
+        <span>Estás actuando como <strong>@actual.Nombre</strong>. Solo un cliente puede crear una obra y depositar el dinero.</span>
+        <form asp-controller="Participantes" asp-action="Cambiar" method="post" class="ms-auto">
+            <input type="hidden" name="id" value="@primerCliente.Id" />
+            <input type="hidden" name="volverA" value="@Url.Action("Nueva")" />
+            <button type="submit" class="btn btn-sm btn-dark">Actuar como @primerCliente.Nombre</button>
+        </form>
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <form id="form-obra" asp-action="Nueva" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3 validacion-resumen"></div>
+
+            <div class="mb-3">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ProveedorId" class="form-label"></label>
+                    <select asp-for="ProveedorId" class="form-select">
+                        @foreach (Participante empresa in empresas)
+                        {
+                            <option value="@empresa.Id">@empresa.Nombre</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ProveedorId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="AprobadorId" class="form-label"></label>
+                    <select asp-for="AprobadorId" class="form-select">
+                        @foreach (Participante aprobador in aprobadores)
+                        {
+                            <option value="@aprobador.Id">@aprobador.Nombre</option>
+                        }
+                    </select>
+                    <span asp-validation-for="AprobadorId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <h5 class="mt-2">Etapas</h5>
+            <p class="small text-muted">Dejá vacías las filas que no uses.</p>
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 3rem">#</th>
+                        <th>Qué se hace</th>
+                        <th style="width: 11rem">Monto (USD)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Etapas.Count; i++)
+                    {
+                        <tr>
+                            <td class="text-muted">@(i + 1)</td>
+                            <td>
+                                <input asp-for="Etapas[i].Descripcion" class="form-control" aria-label="Descripción de la etapa @(i + 1)" />
+                                <span asp-validation-for="Etapas[i].Descripcion" class="text-danger small"></span>
+                            </td>
+                            <td>
+                                <input asp-for="Etapas[i].MontoUsd" class="form-control monto-etapa" aria-label="Monto de la etapa @(i + 1)" />
+                                <span asp-validation-for="Etapas[i].MontoUsd" class="text-danger small"></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th class="text-end">Total a depositar</th>
+                        <th>USD <span id="total-obra">@Model.TotalUsd.ToString("N0")</span></th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <button id="boton-crear" type="submit" class="btn btn-primary">Crear obra y depositar el dinero</button>
+        </form>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="alert alert-light border small">
+            <strong>¿Por qué hay que elegir quién aprueba?</strong><br />
+            La blockchain no puede ver la cocina: no sabe si la instalación eléctrica quedó bien. Por eso se acuerda desde
+            el principio quién la revisa. El contrato solo va a aceptar la aprobación de esa persona.
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function actualizarTotal() {
+            let total = 0;
+            $('.monto-etapa').each(function () {
+                const valor = parseInt($(this).val(), 10);
+                if (!isNaN(valor)) { total += valor; }
+            });
+            $('#total-obra').text(total.toLocaleString('es-AR'));
+        }
+        $('.monto-etapa').on('input', actualizarTotal);
+
+        $('#form-obra').on('submit', function () {
+            if ($(this).valid()) {
+                $('#boton-crear').prop('disabled', true).text('Esperando la confirmación de la blockchain...');
+            }
+        });
+    </script>
+}

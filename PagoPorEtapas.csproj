@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- RedLocal es una herramienta de Node.js (la blockchain de práctica), no forma parte de la app .NET -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);RedLocal/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nethereum.Web3" Version="6.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- El contrato compilado: la app lo usa para publicarlo en la red local -->
+    <None Include="Contratos\compilado\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

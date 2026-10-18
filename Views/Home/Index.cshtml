@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="py-3">
+    <h1 class="display-6">Pagar una obra por etapas con un contrato inteligente</h1>
+    <p class="lead">
+        Contratás a una empresa para remodelar tu cocina por USD 5.000. En lugar de adelantarle todo,
+        el dinero queda guardado en un contrato inteligente y se libera de a partes, a medida que se termina cada etapa.
+    </p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100"><div class="card-body">
+            <h5 class="card-title">1. Se deposita</h5>
+            <p class="card-text small">El cliente deposita los USD 5.000. Quedan bloqueados en el contrato: ni el cliente ni la empresa los pueden tocar.</p>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100"><div class="card-body">
+            <h5 class="card-title">2. Se termina una etapa</h5>
+            <p class="card-text small">La empresa termina, por ejemplo, la instalación eléctrica y avisa en el contrato.</p>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100"><div class="card-body">
+            <h5 class="card-title">3. Se verifica</h5>
+            <p class="card-text small">El cliente o un inspector (el que hayan acordado) revisa el trabajo y lo aprueba.</p>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100"><div class="card-body">
+            <h5 class="card-title">4. Se paga solo</h5>
+            <p class="card-text small">El contrato le transfiere a la empresa el monto de esa etapa, automáticamente.</p>
+        </div></div>
+    </div>
+</div>
+
+<div class="alert alert-light border">
+    <strong>¿Cómo sabe la blockchain que la etapa está terminada?</strong>
+    No lo sabe. Por eso, al crear la obra se acuerda quién aprueba: el contrato solo acepta la aprobación de esa persona
+    y rechaza la de cualquier otra, incluida la de la propia empresa.
+</div>
+
+<h4 class="mt-4">Cómo probarlo</h4>
+<ol>
+    <li>En la barra de arriba elegí <strong>como quién estás actuando</strong>: la clienta, la empresa o el inspector.</li>
+    <li>Como clienta, creá una <a asp-controller="Obras" asp-action="Nueva">obra nueva</a>.</li>
+    <li>Cambiá a la empresa y avisá que terminaste una etapa. Después cambiá a quien aprueba y aprobala.</li>
+    <li>Mirá cómo se mueve la plata en las billeteras.</li>
+</ol>
+
+<a class="btn btn-primary" asp-controller="Obras" asp-action="Index">Ir a las obras</a>

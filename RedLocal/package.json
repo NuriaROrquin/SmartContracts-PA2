@@ -1,0 +1,13 @@
+{
+  "name": "pago-por-etapas-red-local",
+  "private": true,
+  "description": "Red local (Ganache) y compilador del contrato PagoPorEtapas.sol",
+  "scripts": {
+    "start": "ganache --wallet.deterministic --chain.chainId 1337 --server.port 8545",
+    "compilar": "node compilar.js"
+  },
+  "devDependencies": {
+    "ganache": "7.9.2",
+    "solc": "0.8.24"
+  }
+}

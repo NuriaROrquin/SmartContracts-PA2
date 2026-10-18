@@ -1,0 +1,13 @@
+@model EstadoEtapa
+@switch (Model)
+{
+    case EstadoEtapa.EnCurso:
+        <span class="badge bg-secondary">En curso</span>
+        break;
+    case EstadoEtapa.Terminada:
+        <span class="badge bg-warning text-dark">Terminada: falta aprobar</span>
+        break;
+    case EstadoEtapa.Aprobada:
+        <span class="badge bg-success">Aprobada y pagada</span>
+        break;
+}

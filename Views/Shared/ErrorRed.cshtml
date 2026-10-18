@@ -1,0 +1,13 @@
+@model string
+@{
+    ViewData["Title"] = "Sin conexión con la blockchain";
+}
+
+<div class="alert alert-danger">
+    <h4 class="alert-heading">No se pudo hablar con la blockchain</h4>
+    <p class="mb-0">@Model</p>
+</div>
+
+<p>Si estás usando la red local de práctica, abrí una terminal en la carpeta <code>RedLocal</code> del proyecto y ejecutá:</p>
+<pre class="bg-light border rounded p-3"><code>npm start</code></pre>
+<p>Dejá esa terminal abierta y <a href="@(Context.Request.Path)">recargá esta página</a>.</p>
